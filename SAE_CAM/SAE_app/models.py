@@ -1,3 +1,4 @@
+from datetime import timezone
 from django.db import models
 
 class Capteur(models.Model):
@@ -10,8 +11,8 @@ class Capteur(models.Model):
         return f"{self.nom} ({self.id})"
 
 class Data(models.Model):
-    id = models.ForeignKey(id,on_delete=models.CASCADE,db_column='id')
-    date_heure = models.DateTimeField('date heure')
+    id_data = models.ForeignKey(Capteur, on_delete=models.CASCADE,null=True, blank=True)
+    date_heure = models.DateTimeField()
 
     def __str__(self):
-        return f"{self.id}"
+        return f"{self.id_data}"
