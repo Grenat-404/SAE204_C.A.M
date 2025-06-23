@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'SAE_app.apps.SAE_appConfig',
+    'SAE_app.apps.SaeAppConfig',
 ]
 
 MIDDLEWARE = [
