@@ -4,8 +4,16 @@ from django.http import HttpResponse
 from .models import Data, Capteur
 
 def index(request):
-    latest_data = Data.objects.select_related('id_data').order_by('-date_heure')[:20]
-    return render(request, 'index.html', {'latest_data': latest_data})
+    pieces = ['sejour', 'chambre1']
+    latest_by_piece = {}
+    chart_data = {}
+
+    for piece in pieces:
+        qs = (Data.objects.select_related('id_data').filter(id_data__piece=piece).order_by('-date_heure'))
+        latest_by_piece[piece] = qs.first()
+        chart_data[piece] = list(qs[:20])[::-1]
+
+    return render(request, 'index.html', {'latest_by_piece': latest_by_piece,'chart_data': chart_data,})
 
 def Update(request):
     response = HttpResponse(content_type='text/csv')
@@ -26,7 +34,5 @@ def Update(request):
 
 
 def Affiche(request):
-    # Retrieve all Data entries with their related Capteur
     data_list = Data.objects.select_related('id').all()
-    # Render in template 'affiche.html'
     return render(request, 'affiche.html', {'data_list': data_list})

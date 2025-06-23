@@ -2,111 +2,91 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Tableau de bord</title>
-    <link rel="stylesheet" href="{% static 'style.css' %}">
+  <meta charset="UTF-8">
+  <title>Tableau de bord</title>
+  <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 <body>
-    <header>
-        <nav>
-            <ul>
-                <li><a href="{% url 'index' %}">Accueil</a></li>
-                <li><a href="{% url 'affiche' %}">Base de données</a></li>
-            </ul>
-        </nav>
-    </header>
-    <main>
-        {% if latest_data %}
-            {% for data in latest_data|slice:":2" %}
-            <section class="dashboard-row">
-                <div class="dashboard-info">
-                    <div class="card">
-                        <span class="label">Température</span>
-                        <span class="value temp">{{ data.temp }}°C</span>
-                    </div>
-                    <div class="card">
-                        <span class="label">Pièce</span>
-                        <span class="value">{{ data.id_data.piece }}</span>
-                    </div>
-                    <div class="card">
-                        <span class="label">Date</span>
-                        <span class="value">{{ data.date_heure|date:"d/m/Y" }}</span>
-                    </div>
-                    <div class="card">
-                        <span class="label">Heure</span>
-                        <span class="value">{{ data.date_heure|time:"H:i" }}</span>
-                    </div>
-                </div>
-                <div class="dashboard-chart">
-                    <div class="chart-card">
-                        <span class="chart-label">ChartJS valeurs de la température</span>
-                        <canvas id="tempChart" width="400" height="200"></canvas>
-                    </div>
-                </div>
-            </section>
-            {% endfor %}
+  <header>
+    <nav>
+      <ul>
+        <li><a href="{% url 'index' %}">Accueil</a></li>
+        <li><a href="{% url 'affiche' %}">Base de données</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    {% for piece, data in latest_by_piece.items %}
+      <section class="dashboard-row">
+        {% if data %}
+          <div class="dashboard-info">
+            <div class="card">
+              <span class="label">Température</span>
+              <span class="value temp">{{ data.temp }}°C</span>
+            </div>
+            <div class="card">
+              <span class="label">Pièce</span>
+              <span class="value">{{ data.id_data.piece }}</span>
+            </div>
+            <div class="card">
+              <span class="label">Date</span>
+              <span class="value">{{ data.date_heure|date:"d/m/Y" }}</span>
+            </div>
+            <div class="card">
+              <span class="label">Heure</span>
+              <span class="value">{{ data.date_heure|time:"H:i" }}</span>
+            </div>
+          </div>
+          <div class="dashboard-chart">
+            <div class="chart-card">
+              <span class="chart-label">Historique 20 dernières valeurs</span>
+              <canvas id="tempChart-{{ forloop.counter }}"></canvas>
+            </div>
+          </div>
         {% else %}
-            <p>Aucune donnée disponible.</p>
+          <p>Aucune donnée pour <strong>{{ piece }}</strong>.</p>
         {% endif %}
-    </main>
+      </section>
+    {% endfor %}
+  </main>
 
-    <!-- Import de Chart.js depuis un CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Récupération du contexte du canvas
-            const ctx = document.getElementById('tempChart').getContext('2d');
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      {% for piece, series in chart_data.items %}
+        (function(){
+          const ctx = document.getElementById('tempChart-{{ forloop.counter }}').getContext('2d');
+          const labels = [
+            {% for d in series %}
+              '{{ d.date_heure|date:"d/m/Y H:i" }}'{% if not forloop.last %},{% endif %}
+            {% endfor %}
+          ];
+          const temps = [
+            {% for d in series %}
+              {{ d.temp }}{% if not forloop.last %},{% endif %}
+            {% endfor %}
+          ];
 
-            // Construction des labels (dates/heures) et des valeurs de température
-            const labels = [
-                {% for data in latest_data %}
-                    '{{ data.date_heure|date:"d/m/Y H:i" }}'{% if not forloop.last %},{% endif %}
-                {% endfor %}
-            ];
-            const temps = [
-                {% for data in latest_data %}
-                    {{ data.temp }}{% if not forloop.last %},{% endif %}
-                {% endfor %}
-            ];
-
-            // Configuration des données du graphique
-            const data = {
-                labels: labels,
-                datasets: [{
-                    label: 'Température (°C)',
-                    data: temps,
-                    fill: false,
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    tension: 0.1
-                }]
-            };
-
-            // Options d’affichage
-            const options = {
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Date / Heure'
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Température (°C)'
-                        },
-                        beginAtZero: false
-                    }
-                }
-            };
-
-            // Création du line chart
-            new Chart(ctx, {
-                type: 'line',
-                data: data,
-                options: options
-            });
-        });
-    </script>
+          new Chart(ctx, {
+            type: 'line',
+            data: { labels, datasets: [{
+              label: 'Température (°C)',
+              data: temps,
+              fill: false,
+              borderColor: 'rgba(75, 192, 192, 1)',
+              tension: 0.1
+            }]},
+            options: {
+              scales: {
+                x: { title: { display: true, text: 'Date / Heure' } },
+                y: { title: { display: true, text: 'Température (°C)' }, beginAtZero: false }
+              }
+            }
+          });
+        })();
+      {% endfor %}
+    });
+  </script>
 </body>
 </html>
