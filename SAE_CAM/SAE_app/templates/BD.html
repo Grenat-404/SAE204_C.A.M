@@ -1,0 +1,54 @@
+{# templates/BD.html #}
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Base de données</title>
+  <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+  <header>
+    <nav>
+      <ul>
+        <li><a href="{% url 'capteurs:index' %}">Accueil</a></li>
+        <li><a href="{% url 'capteurs:BD' %}">Base de données</a></li>
+      </ul>
+    </nav>
+  </header>
+  <main>
+    <h1>Rechercher des données</h1>
+    <form method="get" class="search-form">
+      <input type="text" name="search_id" placeholder="ID capteur" value="{{ request.GET.search_id }}" />
+      <input type="date" name="date_from" value="{{ request.GET.date_from }}" />
+      <input type="date" name="date_to"   value="{{ request.GET.date_to }}" />
+      <button type="submit">Filtrer</button>
+      <a href="{% url 'capteurs:BD' %}" class="btn-reset">Réinitialiser</a>
+    </form>
+    {% if data_list %}
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Capteur ID</th><th>Nom</th><th>Pièce</th><th>Emplacement</th>
+            <th>Date / Heure</th><th>Température (°C)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for data in data_list %}
+          <tr>
+            <td>{{ data.id_data.id }}</td>
+            <td>{{ data.id_data.nom }}</td>
+            <td>{{ data.id_data.piece }}</td>
+            <td>{{ data.id_data.emplacement }}</td>
+            <td>{{ data.date_heure|date:"d/m/Y H:i" }}</td>
+            <td>{{ data.temp }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>Aucune donnée ne correspond à vos critères.</p>
+    {% endif %}
+  </main>
+</body>
+</html>

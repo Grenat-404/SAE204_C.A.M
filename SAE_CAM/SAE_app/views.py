@@ -33,6 +33,24 @@ def Update(request):
     return response
 
 
+#def Affiche(request):
+#    data_list = Data.objects.select_related('id').all()
+#    return render(request, 'affiche.html', {'data_list': data_list})
+
 def Affiche(request):
-    data_list = Data.objects.select_related('id').all()
-    return render(request, 'affiche.html', {'data_list': data_list})
+    qs = Data.objects.select_related('id_data').all()
+
+    search_id = request.GET.get('search_id')
+    if search_id:
+        qs = qs.filter(id_data__id=search_id)
+
+    date_from = request.GET.get('date_from')
+    date_to   = request.GET.get('date_to')
+    if date_from:
+        qs = qs.filter(date_heure__date__gte=date_from)
+    if date_to:
+        qs = qs.filter(date_heure__date__lte=date_to)
+
+    qs = qs.order_by('-date_heure')
+
+    return render(request, 'BD.html', {'data_list': qs})
