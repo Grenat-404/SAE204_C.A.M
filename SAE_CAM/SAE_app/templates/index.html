@@ -17,7 +17,7 @@
     </header>
     <main>
         {% if latest_data %}
-            {% for data in latest_data %}
+            {% for data in latest_data|slice:":2" %}
             <section class="dashboard-row">
                 <div class="dashboard-info">
                     <div class="card">
@@ -40,6 +40,7 @@
                 <div class="dashboard-chart">
                     <div class="chart-card">
                         <span class="chart-label">ChartJS valeurs de la température</span>
+                        <canvas id="tempChart" width="400" height="200"></canvas>
                     </div>
                 </div>
             </section>
@@ -48,5 +49,64 @@
             <p>Aucune donnée disponible.</p>
         {% endif %}
     </main>
+
+    <!-- Import de Chart.js depuis un CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Récupération du contexte du canvas
+            const ctx = document.getElementById('tempChart').getContext('2d');
+
+            // Construction des labels (dates/heures) et des valeurs de température
+            const labels = [
+                {% for data in latest_data %}
+                    '{{ data.date_heure|date:"d/m/Y H:i" }}'{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ];
+            const temps = [
+                {% for data in latest_data %}
+                    {{ data.temp }}{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ];
+
+            // Configuration des données du graphique
+            const data = {
+                labels: labels,
+                datasets: [{
+                    label: 'Température (°C)',
+                    data: temps,
+                    fill: false,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    tension: 0.1
+                }]
+            };
+
+            // Options d’affichage
+            const options = {
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Date / Heure'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Température (°C)'
+                        },
+                        beginAtZero: false
+                    }
+                }
+            };
+
+            // Création du line chart
+            new Chart(ctx, {
+                type: 'line',
+                data: data,
+                options: options
+            });
+        });
+    </script>
 </body>
 </html>

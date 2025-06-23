@@ -79,7 +79,7 @@ DATABASES = {
         'NAME': 'sae204CAM',
         'USER': 'toto',
         'PASSWORD': 'toto',
-        'HOST': '10.252.15.108',
+        'HOST': '10.252.15.45',
         'PORT': '3306',
     }
 }

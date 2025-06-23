@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from .models import Data, Capteur
 
 def index(request):
-    latest_data = Data.objects.select_related('id_data').order_by('-date_heure')[:2]
+    latest_data = Data.objects.select_related('id_data').order_by('-date_heure')[:20]
     return render(request, 'index.html', {'latest_data': latest_data})
 
 def Update(request):
