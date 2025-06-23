@@ -17,8 +17,9 @@ class capteurForm(forms.ModelForm):
 class dataForm(forms.ModelForm):
     class Meta:
         model = models.Data
-        fields = ('id_data', 'date_heure')
+        fields = ('id_data', 'date_heure', 'temp')
         labels = {
             'id_data': _('Id'),
             'date_heure': _("Date et Heure"),
+            'temp': _('Température'),
         }

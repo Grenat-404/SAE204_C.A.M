@@ -19,7 +19,8 @@ def Update(request):
             capteur.nom,
             capteur.piece,
             capteur.emplacement,
-            data.date_heure
+            data.date_heure,
+            data.temp,
         ])
     return response
 

@@ -13,6 +13,7 @@ class Capteur(models.Model):
 class Data(models.Model):
     id_data = models.ForeignKey(Capteur, on_delete=models.CASCADE,null=True, blank=True)
     date_heure = models.DateTimeField()
+    temp = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
         return f"{self.id_data}"
