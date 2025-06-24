@@ -169,7 +169,8 @@ main {
 
 .search-form input[type="text"],
 .search-form input[type="date"],
-.search-form select {
+.search-form select,
+.nav-form select {
     padding: 8px 12px;
     border: 1px solid #aaa;
     border-radius: 6px;

@@ -17,13 +17,11 @@
     </nav>
   </header>
   <main>
-    <h1>Renommer les capteurs</h1>
+    <h1>Renommage</h1>
         <form method="post" action="{% url 'rename' %}" class="nav-form">
         {% csrf_token %}
         <select name="capteur_id" required>
-          <option value="" disabled {% if not selected_search_id_int %}selected{% endif %}>
-            Choisir un capteur
-          </option>
+          <option value="" disabled {% if not selected_search_id_int %}selected{% endif %}>Choisir un capteur ⬇</option>
           {% for cap in capteurs %}
             <option value="{{ cap.id }}">
               {{ cap.id }}
@@ -33,12 +31,11 @@
         <input type="text" name="new_name" placeholder="Nouveau nom" required>
         <button type="submit">Renommer</button>
       </form>
+
     <h1>Rechercher des données</h1>
     <form method="get" class="search-form">
       <select name="search_id">
-        <option value="" {% if not selected_search_id_int %}selected{% endif %}>
-          Tous capteurs ⬇
-        </option>
+        <option value="" {% if not selected_search_id_int %}selected{% endif %}>Tous capteurs ⬇</option>
         {% for cap in capteurs %}
           <option value="{{ cap.id }}"
             {% if cap.id == selected_search_id_int %}selected{% endif %}>
