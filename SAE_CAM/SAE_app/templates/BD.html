@@ -11,8 +11,8 @@
   <header>
     <nav>
       <ul>
-        <li><a href="{% url 'capteurs:index' %}">Accueil</a></li>
-        <li><a href="{% url 'capteurs:BD' %}">Base de données</a></li>
+        <li><a href="{% url 'index' %}">Accueil</a></li>
+        <li><a href="{% url 'BD' %}">Base de données</a></li>
       </ul>
     </nav>
   </header>
@@ -23,7 +23,7 @@
       <input type="date" name="date_from" value="{{ request.GET.date_from }}" />
       <input type="date" name="date_to"   value="{{ request.GET.date_to }}" />
       <button type="submit">Filtrer</button>
-      <a href="{% url 'capteurs:BD' %}" class="btn-reset">Réinitialiser</a>
+      <a href="{% url 'BD' %}" class="btn-reset">Réinitialiser</a>
     </form>
     {% if data_list %}
       <table class="data-table">
