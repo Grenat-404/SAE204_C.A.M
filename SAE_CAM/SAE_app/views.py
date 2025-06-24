@@ -105,7 +105,6 @@ def export_csv(request):
 
     qs = qs.order_by('-date_heure')
 
-    # 3) génération du CSV
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="export_capteurs.csv"'
     writer = csv.writer(response)
@@ -126,12 +125,29 @@ def export_csv(request):
 
 def rename_capteur(request):
     if request.method == 'POST':
-        capteur_id = request.POST.get('capteur_id')
-        new_name   = request.POST.get('new_name')
+        capteur_id      = request.POST.get('capteur_id')
+        new_name        = request.POST.get('new_name')
+        new_emplacement = request.POST.get('new_emplacement')
+
         try:
             cap = Capteur.objects.get(pk=capteur_id)
-            cap.nom = new_name
+            # mise à jour du nom si fourni
+            if new_name:
+                cap.nom = new_name
+            # mise à jour de l’emplacement si fourni
+            if new_emplacement:
+                cap.emplacement = new_emplacement
             cap.save()
         except Capteur.DoesNotExist:
             pass
+
+    return redirect(request.META.get('HTTP_REFERER', reverse('index')))
+
+def rename_emplacement(request):
+    if request.method == 'POST':
+        old = request.POST.get('old_emplacement')
+        new = request.POST.get('new_emplacement')
+        if old and new:
+            # met à jour tous les capteurs qui avaient l'ancien emplacement
+            Capteur.objects.filter(emplacement=old).update(emplacement=new)
     return redirect(request.META.get('HTTP_REFERER', reverse('index')))

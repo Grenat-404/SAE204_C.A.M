@@ -18,19 +18,39 @@
   </header>
   <main>
     <h1>Renommage</h1>
-        <form method="post" action="{% url 'rename' %}" class="nav-form">
-        {% csrf_token %}
-        <select name="capteur_id" required>
-          <option value="" disabled {% if not selected_search_id_int %}selected{% endif %}>Choisir un capteur ⬇</option>
-          {% for cap in capteurs %}
-            <option value="{{ cap.id }}">
-              {{ cap.id }}
-            </option>
-          {% endfor %}
-        </select>
-        <input type="text" name="new_name" placeholder="Nouveau nom" required>
-        <button type="submit">Renommer</button>
-      </form>
+<form method="post" action="{% url 'rename' %}" class="nav-form">
+  {% csrf_token %}
+
+  <select name="capteur_id" required>
+    <option value="" disabled selected>Choisir un capteur ⬇</option>
+    {% for cap in capteurs %}
+      <option value="{{ cap.id }}">
+        {{ cap.id }}
+      </option>
+    {% endfor %}
+  </select>
+  <select name="new_emplacement">
+    <option value="" selected>Choisir l'emplacement ⬇</option>
+    {% for e in emplacements %}
+      <option value="{{ e }}">{{ e }}</option>
+    {% endfor %}
+  </select>
+
+  <input type="text" name="new_name" placeholder="Nouveau nom">
+
+  <button type="submit">Appliquer</button>
+</form>
+    <form method="post" action="{% url 'rename_emplacement' %}" class="nav-form">
+  {% csrf_token %}
+  <select name="old_emplacement" required>
+    <option value="" disabled selected>Choisir l’emplacement à renommer ⬇</option>
+    {% for e in emplacements %}
+      <option value="{{ e }}">{{ e }}</option>
+    {% endfor %}
+  </select>
+  <input type="text" name="new_emplacement" placeholder="Nouveau nom d’emplacement" required>
+  <button type="submit">Appliquer</button>
+</form>
 
     <h1>Rechercher des données</h1>
     <form method="get" class="search-form">
