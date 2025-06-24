@@ -7,16 +7,29 @@ from django.urls import reverse
 
 
 def index(request):
-    pieces = ['sejour', 'chambre1']
+    try:
+        refresh_interval = int(request.GET.get('refresh_interval', 15))
+    except (TypeError, ValueError):
+        refresh_interval = 15
+    refresh_interval = max(5, min(refresh_interval, 300))
+
+    pieces = Capteur.objects.values_list('piece', flat=True).distinct()
     latest_by_piece = {}
     chart_data = {}
 
     for piece in pieces:
-        qs = (Data.objects.select_related('id_data').filter(id_data__piece=piece).order_by('-date_heure'))
+        qs = (Data.objects
+                  .select_related('id_data')
+                  .filter(id_data__piece=piece)
+                  .order_by('-date_heure'))
         latest_by_piece[piece] = qs.first()
         chart_data[piece] = list(qs[:50])[::-1]
 
-    return render(request, 'index.html', {'latest_by_piece': latest_by_piece,'chart_data': chart_data,})
+    return render(request, 'index.html', {
+        'latest_by_piece': latest_by_piece,
+        'chart_data': chart_data,
+        'refresh_interval': refresh_interval,
+    })
 
 def Update(request):
     response = HttpResponse(content_type='text/csv')
@@ -34,11 +47,6 @@ def Update(request):
             data.temp,
         ])
     return response
-
-
-#def Affiche(request):
-#    data_list = Data.objects.select_related('id').all()
-#    return render(request, 'affiche.html', {'data_list': data_list})
 
 def Affiche(request):
     qs = Data.objects.select_related('id_data').all()
@@ -62,6 +70,12 @@ def Affiche(request):
     if selected_piece:
         qs = qs.filter(id_data__piece=selected_piece)
 
+    try:
+        refresh_interval = int(request.GET.get('refresh_interval', 15))
+    except ValueError:
+        refresh_interval = 15
+    refresh_interval = max(5, min(refresh_interval, 300))
+
     qs = qs.order_by('-date_heure')
 
     capteurs = Capteur.objects.all()
@@ -70,6 +84,7 @@ def Affiche(request):
     noms = Data.objects.values_list('id_data__nom', flat=True).distinct()
 
     return render(request, 'BD.html', {
+        'refresh_interval': refresh_interval,
         'data_list': qs,
         'capteurs': capteurs,
         'noms': noms,
@@ -125,16 +140,14 @@ def export_csv(request):
 
 def rename_capteur(request):
     if request.method == 'POST':
-        capteur_id      = request.POST.get('capteur_id')
-        new_name        = request.POST.get('new_name')
-        new_emplacement = request.POST.get('new_emplacement')
+        capteur_id = request.POST.get('capteur_id')
+        new_name = request.POST.get('new_name', '').strip()
+        new_emplacement = request.POST.get('new_emplacement', '').strip()
 
         try:
             cap = Capteur.objects.get(pk=capteur_id)
-            # mise à jour du nom si fourni
             if new_name:
                 cap.nom = new_name
-            # mise à jour de l’emplacement si fourni
             if new_emplacement:
                 cap.emplacement = new_emplacement
             cap.save()
@@ -146,8 +159,7 @@ def rename_capteur(request):
 def rename_emplacement(request):
     if request.method == 'POST':
         old = request.POST.get('old_emplacement')
-        new = request.POST.get('new_emplacement')
+        new = request.POST.get('new_emplacement', '').strip()
         if old and new:
-            # met à jour tous les capteurs qui avaient l'ancien emplacement
             Capteur.objects.filter(emplacement=old).update(emplacement=new)
     return redirect(request.META.get('HTTP_REFERER', reverse('index')))
