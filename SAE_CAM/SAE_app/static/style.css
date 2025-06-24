@@ -31,6 +31,32 @@ nav ul li a {
     font-size: 15px;
 }
 
+nav .nav-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 16px;
+}
+
+nav .nav-form input {
+    padding: 4px 8px;
+    font-size: 12px;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    background: #fff;
+    color: #111;
+}
+
+nav .nav-form button {
+    padding: 4px 8px;
+    font-size: 12px;
+    background: #c4c4c4;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+
 main {
     padding: 0 32px 32px 32px;
 }
@@ -103,9 +129,9 @@ main {
     background: #ddd;
     border-radius: 12px;
     padding: 12px;
-    min-width: 300px;
-    min-height: 160px;
-    max-width: 400px;
+    min-width: 600px;
+    min-height: 320px;
+    max-width: 800px;
     width: 100%;
     position: relative;
     display: flex;
@@ -133,7 +159,6 @@ main {
     border-radius: 50%;
 }
 
-
 .search-form {
     margin-bottom: 24px;
     display: flex;
@@ -143,11 +168,16 @@ main {
 }
 
 .search-form input[type="text"],
-.search-form input[type="date"] {
+.search-form input[type="date"],
+.search-form select {
     padding: 8px 12px;
     border: 1px solid #aaa;
     border-radius: 6px;
     font-size: 14px;
+    background: #fff;
+    color: #111;
+    appearance: none;
+    cursor: pointer;
 }
 
 .search-form button,
@@ -167,6 +197,23 @@ main {
     border: 1px solid #aaa;
 }
 
+.btn-export {
+    margin: 0;
+}
+
+.search-form .btn-export {
+    margin-left: 8px;
+    align-self: center;
+    padding: 8px 16px;
+    background: #aaa;
+    color: #111;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* ==== Tableau des données ==== */
 .data-table {
     width: 100%;
     border-collapse: collapse;
@@ -184,4 +231,13 @@ main {
 .data-table th {
     background: #ddd;
     color: #111;
+}
+
+/* Responsive pour le tableau */
+@media (max-width: 800px) {
+    .data-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
 }

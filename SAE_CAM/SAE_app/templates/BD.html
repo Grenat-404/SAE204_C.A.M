@@ -1,10 +1,10 @@
-{# templates/BD.html #}
 {% load static %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
   <title>Base de données</title>
+  <meta http-equiv="refresh" content="15">
   <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 <body>
@@ -17,13 +17,63 @@
     </nav>
   </header>
   <main>
+    <h1>Renommer les capteurs</h1>
+        <form method="post" action="{% url 'rename' %}" class="nav-form">
+        {% csrf_token %}
+        <select name="capteur_id" required>
+          <option value="" disabled {% if not selected_search_id_int %}selected{% endif %}>
+            Choisir un capteur
+          </option>
+          {% for cap in capteurs %}
+            <option value="{{ cap.id }}">
+              {{ cap.id }}
+            </option>
+          {% endfor %}
+        </select>
+        <input type="text" name="new_name" placeholder="Nouveau nom" required>
+        <button type="submit">Renommer</button>
+      </form>
     <h1>Rechercher des données</h1>
     <form method="get" class="search-form">
-      <input type="text" name="search_id" placeholder="ID capteur" value="{{ request.GET.search_id }}" />
+      <select name="search_id">
+        <option value="" {% if not selected_search_id_int %}selected{% endif %}>
+          Tous capteurs ⬇
+        </option>
+        {% for cap in capteurs %}
+          <option value="{{ cap.id }}"
+            {% if cap.id == selected_search_id_int %}selected{% endif %}>
+            {{ cap.id }}
+          </option>
+        {% endfor %}
+      </select>
+      <select name="nom">
+        <option value="" {% if not selected_nom %}selected{% endif %}>Noms capteurs ⬇</option>
+        {% for n in noms %}
+          <option value="{{ n }}" {% if n == selected_nom %}selected{% endif %}>{{ n|capfirst }}</option>
+        {% endfor %}
+      </select>
       <input type="date" name="date_from" value="{{ request.GET.date_from }}" />
       <input type="date" name="date_to"   value="{{ request.GET.date_to }}" />
+      <select name="emplacement">
+        <option value="" {% if not selected_emplacement %}selected{% endif %}>Tous emplacements ⬇</option>
+        {% for e in emplacements %}
+          <option value="{{ e }}"
+            {% if e == selected_emplacement %}selected{% endif %}>
+            {{ e }}
+          </option>
+        {% endfor %}
+      </select>
+      <select name="piece">
+        <option value="" {% if not selected_piece %}selected{% endif %}>Toutes pièces ⬇</option>
+        {% for p in pieces %}
+          <option value="{{ p }}" {% if p == selected_piece %}selected{% endif %}>
+            {{ p|capfirst }}
+          </option>
+        {% endfor %}
+      </select>
       <button type="submit">Filtrer</button>
       <a href="{% url 'BD' %}" class="btn-reset">Réinitialiser</a>
+      <a href="{% url 'export' %}?{{ request.GET.urlencode }}" class="btn-export">Exporter CSV</a>
     </form>
     {% if data_list %}
       <table class="data-table">
